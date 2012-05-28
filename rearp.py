@@ -79,6 +79,7 @@ def rearp(gateway):
 	   		send(packet, verbose=0)
 	   		time.sleep(1)
 	   		send(packet, verbose=0)
+		print 'Network Re-ARP Completed'
 	else:
 		print 'Router MAC address could not be found. Re-ARPing failed.'
 if __name__ == '__main__':

@@ -23,25 +23,25 @@
 
 <script type="text/javascript">
 {% if status == "on" %}
-        $(document).ready(function () {
-          $("#startpwn").hide("slow")
-        });
-        $(document).ready(function () {
-          $("#onbar").show("slow");
-        });
-        $(document).ready(function () {
-          $("#stoppwn").show("slow");
-        });
+	$(document).ready(function () {
+	  $("#startpwn").hide("slow")
+	});
+	$(document).ready(function () {
+	  $("#onbar").show("slow");
+	});
+	$(document).ready(function () {
+	  $("#stoppwn").show("slow");
+	});
 {% else %}
-        $(document).ready(function () {
-          $("#startpwn").show("slow");
-        });
-        $(document).ready(function () {
-          $("#onbar").hide("slow")
-        });
-        $(document).ready(function () {
-          $("#stoppwn").hide("slow");
-        });
+	$(document).ready(function () {
+	  $("#startpwn").show("slow");
+	});
+	$(document).ready(function () {
+	  $("#onbar").hide("slow")
+	});
+	$(document).ready(function () {
+	  $("#stoppwn").hide("slow");
+	});
 
 {% endif %}
 </script>

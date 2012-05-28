@@ -145,17 +145,11 @@ class ServerConnection(HTTPClient):
            self.client.setHeader("Content-Length", self.contentLength)
 
        if self.length == 0:
-	   try:
-               self.shutdown()
-	   except:
-	       pass
+           self.shutdown()
                         
     def handleResponsePart(self, data):
         if (self.isImageRequest):
-	    try:
-                self.client.write(data)
-	    except:
- 		pass
+            self.client.write(data)
         else:
             HTTPClient.handleResponsePart(self, data)
 
@@ -163,10 +157,7 @@ class ServerConnection(HTTPClient):
         if (self.isImageRequest):
             self.shutdown()
         else:
-	    try:
-                HTTPClient.handleResponseEnd(self)
-	    except:
-		pass
+            HTTPClient.handleResponseEnd(self)
 
     def handleResponse(self, data):
         if (self.isCompressed):
@@ -230,8 +221,5 @@ class ServerConnection(HTTPClient):
     def shutdown(self):
         if not self.shutdownComplete:
             self.shutdownComplete = True
-	    try:
-                self.client.finish()
-	    except:
-		pass
+            self.client.finish()
             self.transport.loseConnection()

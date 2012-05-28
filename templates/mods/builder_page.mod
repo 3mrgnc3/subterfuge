@@ -64,19 +64,13 @@
       </td>   
       </tr>
       <tr>
-      <td>GUI Page:</td>
-      <td>
-      <input title = "This code should be HTML, Javascript, and or Django if necessary. This will determine the look and feel of your module's page. (Only necessary for modules with pages)" type = "file" name = "guipage">
-      </td>
       <td>Python Code:</td>
       <td>
       <input title = "This code should be the part of your module that actually does stuff." type = "file" name = "exploitcode">
       </td>    
-      </tr>
-      <tr>
-      <td>GUI Settings:</td>
+      <td>Module Description:</td>
       <td>
-      <input title = "This code should be HTML, Javascript, and or Django if necessary. This will determine the quick configuration settings for your module." type = "file" name = "guisettings">
+      <input type = "text" name = "description">
       </td>    
       </tr>
       </table>

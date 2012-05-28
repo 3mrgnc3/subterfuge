@@ -53,6 +53,12 @@ $(document).ready(function() {
    $('#pluginconfigboxwireless').hide();
    $('#pluginconfigboxevilgrade').hide();
    
+{% if modules %}
+ {% for mod in modules %}
+         $("#pluginconfigbox{{ mod.name }}").hide();
+ {% endfor %}
+{% endif %}
+   
 });
 </script>
 <script type="text/javascript">
@@ -68,6 +74,13 @@ function hideconfigs()
    $('#pluginconfigboxevilgrade').hide();
    $('#pluginconfigboxbuilder').hide();
    $('#pluginconfigboxtunnelblock').hide();
+   
+{% if modules %}
+ {% for mod in modules %}
+         $("#pluginconfigbox{{ mod.name }}").hide();
+ {% endfor %}
+{% endif %}
+   
 } 
 
 function showhttpinjectionconfig()
@@ -113,9 +126,11 @@ function showevilgradeconfig()
 
         <!--     PLUGINS     -->
 
+      {% include "mods/netview.mod" %}
       {% include "mods/harvester.mod" %}
       {% include "mods/builder.mod" %}
       {% include "mods/tunnelblock.mod" %}
+      {% include "mods/dos.mod" %}
 
 
       <a href = "#httpcodeinjection">
@@ -165,10 +180,12 @@ function showevilgradeconfig()
             </div>
             
                <!--   PLUGIN SETTINGS     -->
-                           
+            
+            {% include "mods/netview_settings.mod" %}               
             {% include "mods/harvester_settings.mod" %}
             {% include "mods/builder_settings.mod" %}         
             {% include "mods/tunnelblock_settings.mod" %}
+            {% include "mods/dos_settings.mod" %}
             
             
             <div id = "pluginconfigboxhijacking">
@@ -230,7 +247,7 @@ function showevilgradeconfig()
                {
                  document.httpinjectionform.submit();
                }
-                </script>
+               </script>
                </form>    
             </div>
       </fieldset>

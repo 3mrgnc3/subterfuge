@@ -8,9 +8,16 @@ class installed(models.Model):
     
 class iptrack(models.Model):
     address     = models.CharField(max_length=300)
+    mac         = models.CharField(max_length=300)
+    os          = models.CharField(max_length=300, default = 'unknown')
+    osdetails   = models.CharField(max_length=300)
     injected    = models.CharField(max_length=300)
+    expand     = models.CharField(max_length=300, default = '0')
     
     
-    
-
+class scan(models.Model):
+    address     = models.CharField(max_length=300)
+    ports       = models.CharField(max_length=300)
+    osdetails   = models.CharField(max_length=300)
+    hostname    = models.CharField(max_length=300)
 

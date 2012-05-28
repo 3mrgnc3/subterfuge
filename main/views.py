@@ -19,47 +19,48 @@ from subterfuge.modules.views import *
 @csrf_protect
 @never_cache
 def index(request):
-	if request.is_ajax():
-			#Get Creds from DB
-		creds = credentials.objects.all()
-		
-		   #Reset Injection Counter
-		iptrack.objects.update(injected = "0")
+   if request.is_ajax():
+	      #Get Creds from DB
+      creds = credentials.objects.all()
 
-			#Check Arpspoof status
-		command = "ps -A 1 | sed -e '/arpmitm/!d;/sed -e/d;s/^ //;s/ pts.*//'"
-		a = os.popen(command)
-		reply = a.read()
-		if(len(reply)>1):
-			status = "on"
-		else:
-			status = "off"
-			
+         #Reset Injection Counter
+      iptrack.objects.update(injected = "0")
+
+	      #Check Arpspoof status
+      command = "ps -A 1 | sed -e '/arpmitm/!d;/sed -e/d;s/^ //;s/ pts.*//'"
+      a = os.popen(command)
+      reply = a.read()
+      if(len(reply)>1):
+	      status = "on"
+      else:
+	      status = "off"
+	
          
-			#Relay Template Variables
-		return render_to_response("includes/credtable.inc", {
-			"credential"    :   creds,
-			"status"			 :	  status,
-		})
-	else:            
-			#Check Arpspoof status
-		command = "ps -A 1 | sed -e '/arpmitm/!d;/sed -e/d;s/^ //;s/ pts.*//'"
-		a = os.popen(command)
-		reply = a.read()
-		if(len(reply)>1):
-			status = "on"
-		else:
-			status = "off"
-			
-			# Read in subterfuge.conf
-		with open(str(os.path.dirname(__file__)).rstrip("abcdefghijklmnnnopqrstruvwxyz") + 'subterfuge.conf', 'r') as file:
-		   conf = file.readlines()
-		   
-			#Relay Template Variables
-		return render_to_response("home.ext", {
-			"status"    :   status,
-			"conf"      :   str(conf[20]).rstrip('\n'),
-		})
+	      #Relay Template Variables
+      return render_to_response("includes/credtable.inc", {
+	      "credential"    :   creds,
+	      "status"			 :	  status,
+      })
+   else:            
+	      #Check Arpspoof status
+      command = "ps -A 1 | sed -e '/arpmitm/!d;/sed -e/d;s/^ //;s/ pts.*//'"
+      a = os.popen(command)
+      reply = a.read()
+      if(len(reply)>1):
+	      status = "on"
+      else:
+	      status = "off"
+
+	
+	      # Read in subterfuge.conf
+      with open(str(os.path.dirname(__file__)).rstrip("abcdefghijklmnnnopqrstruvwxyz") + 'subterfuge.conf', 'r') as file:
+         conf = file.readlines()
+         
+	      #Relay Template Variables
+      return render_to_response("home.ext", {
+	      "status"    :   status,
+	      "conf"      :   str(conf[20]).rstrip('\n'),
+      })
         
         
 def plugins(request):
@@ -69,11 +70,119 @@ def plugins(request):
       		#Read in Config File
         f = open(str(os.path.dirname(__file__)).rstrip("abcdefghijklmnnnopqrstruvwxyz") + 'subterfuge.conf', 'r')
         config = f.readlines()
-                    
+        
+        modules = installed.objects.all()
+                   
             #Relay Template Variables
         return render_to_response("plugins.ext", {
             "config"    :   config,
+            "modules"   :   modules,
         })
+        
+        
+def netview(request):
+    if request.is_ajax():
+      		#Read in Config File
+        f = open(str(os.path.dirname(__file__)).rstrip("abcdefghijklmnnnopqrstruvwxyz") + 'subterfuge.conf', 'r')
+        config = f.readlines()
+        
+        		#Check ARP Poison status
+        command = "ps -A 1 | sed -e '/arpmitm/!d;/sed -e/d;s/^ //;s/ pts.*//'"
+        a = os.popen(command)
+        reply = a.read()
+        if(len(reply)>1):
+        	status = "on"
+        else:
+        	status = "off"
+        
+        modules = installed.objects.all()
+        client  = iptrack.objects.exclude(id = "1").all()
+        scanout = scan.objects.all()
+        
+           #Relay Template Variables
+        return render_to_response("includes/netview.inc", {
+            "config"    :   config,
+            "modules"   :   modules,
+            "client"    :   client,
+            "scan"      :   scanout,
+            "status"		:	 status,
+        })
+        
+    else:
+      		#Read in Config File
+        f = open(str(os.path.dirname(__file__)).rstrip("abcdefghijklmnnnopqrstruvwxyz") + 'subterfuge.conf', 'r')
+        config = f.readlines()
+        
+        '''
+        newmod = installed(name = "httpcodeinjection")
+        newmod.save()
+        newmod = installed(name = "tunnelblock")
+        newmod.save()
+        newmod = installed(name = "dos")
+        newmod.save()
+         '''       
+
+		       #Check ARP Poison status
+        command = "ps -A 1 | sed -e '/arpmitm/!d;/sed -e/d;s/^ //;s/ pts.*//'"
+        a = os.popen(command)
+        reply = a.read()
+        if(len(reply)>1):
+        	status = "on"
+        else:
+        	status = "off"
+        
+        modules = installed.objects.all()
+        client  = iptrack.objects.exclude(id = "1").all()
+        scanout = scan.objects.all()
+        
+           #Relay Template Variables
+        return render_to_response("netview.ext", {
+            "config"    :   config,
+            "modules"   :   modules,
+            "client"    :   client,
+            "scan"      :   scanout,
+            "status"		:	 status,
+        }) 
+        
+
+def netctrl(request, cmd):
+    if request.is_ajax():
+
+        if cmd == "scan":
+            address = request.POST["target"]
+            os.system("python " + str(os.path.dirname(__file__)).rstrip("abcdefghijklmnnnopqrstruvwxyz") + "scan.py " + address + " &")
+
+        if cmd == "expand":
+            iptrack.objects.filter(address = request.POST["address"]).update(expand = "1")
+
+        if cmd == "shrink":
+            iptrack.objects.filter(address = request.POST["address"]).update(expand = "0")
+
+      		#Read in Config File
+        f = open(str(os.path.dirname(__file__)).rstrip("abcdefghijklmnnnopqrstruvwxyz") + 'subterfuge.conf', 'r')
+        config = f.readlines()
+        
+        
+        modules = installed.objects.all()
+        client  = iptrack.objects.exclude(id = "1").all()
+        scanout = scan.objects.all()
+        
+           #Relay Template Variables
+        return render_to_response("mods/netview.mod", {
+            "config"    :   config,
+            "modules"   :   modules,
+            "client"    :   client,
+            "scan"      :   scanout,
+        }) 
+        
+    else:
+                   
+            #Relay Template Variables
+        return render_to_response("netview.ext", {
+            "config"    :   "um",
+        })    
+        
+        
         
         #Writes to the Config File are handled here
 def conf(request, module):
@@ -102,15 +211,25 @@ def conf(request, module):
 
       ipaddress = re.findall(r'\d*.\d*.\d*.\d*', temp)[0]
       conf[26] = ipaddress + "\n"
-   
+
+   if module == "update":
+      os.system('xterm -e sh -c "python ' + str(os.path.dirname(__file__)).rstrip("abcdefghijklmnnnopqrstruvwxyz") + 'update.py' + '" &')
+
       #################################
       #Subterfuge Module Configurations
       #################################
-   if module == "httpinjection":   
-      httpcodeinjection(request, module, conf)
       
-   if module == "tunnelblock":   
+   if module == "httpinjection":   
+      httpcodeinjection(request, conf)
+      
+   elif module == "tunnelblock":   
       tunnelblock()
+      
+   else:
+      for mod in installed.objects.all():
+         if module == mod.name:
+           os.system('python ' + str(os.path.dirname(__file__)).rstrip("abcdefghijklmnnnopqrstruvwxyz") + 'modules/' + module + '/' + module + '.py &')
+   
               
       #################################
       #  END MODULE CONFIGURATION
@@ -131,7 +250,7 @@ def conf(request, module):
    else:
 	   status = "off"
 	   #Relay Template Variables
-   return render_to_response("home.ext", {
+   return render_to_response(request.META['HTTP_REFERER'].split('/')[3] + ".ext", {
 	   "status"    :   status,
    })
         
@@ -147,9 +266,9 @@ def settings(request):
       result = []
       result.append(temp)
       while (temp != ''):
-         temp = f.readline().rstrip('\n')
-         if (temp != 'lo'):
-            result.append(temp)
+        temp = f.readline().rstrip('\n')
+        if (temp != 'lo'):
+           result.append(temp)
       result.remove('')
         
          #Get Gateway
@@ -220,8 +339,8 @@ def startpwn(request, method):
         result.append(temp)
         while (temp != ''):
            temp = f.readline().rstrip('\n')
-	   if (temp != 'lo'):
-              result.append(temp)
+           if (temp != 'lo'):
+                    result.append(temp)
         result.remove('')
         
             # Get Gateway
@@ -320,4 +439,7 @@ def gate(request):
       })
    else:            
       print "Nope... Chuck Testa!"
+      
+      
+
         

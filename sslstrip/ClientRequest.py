@@ -119,10 +119,7 @@ class ClientRequest(Request):
 
     def handleHostResolvedError(self, error):
         logging.warning("Host resolution error: " + str(error))
-	try:
-            self.finish()
-	except:
-	    pass
+        self.finish()
 
     def resolveHost(self, host):
         address = self.dnsCache.getCachedAddress(host)

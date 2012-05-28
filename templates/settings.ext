@@ -28,6 +28,9 @@
             </div>
         </fieldset>
         
+		  <a href = "#" name = "update"><div id = "redbutton">Update</div></a>
+
+		  
         <form name = "configform" method = "post" action = "/config/settings/">
           
         <fieldset class = "generalsettings">
@@ -91,6 +94,8 @@
     <h2><a name="Advanced" id="Advanced">Oh No More Settings...</a></h2>
     <p>jk</p>
   </div>
+</div>
+<div id = "invis">
 </div>
 
 {% endblock %}

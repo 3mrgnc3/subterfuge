@@ -19,23 +19,57 @@
 <script type="text/javascript" src="/static/js/jquery.js"></script><!-- jQuery -->
 <script type="text/javascript" src="/static/js/domtab.js"></script><!-- Configuration Menu-->
 
-<!-- Start/Stop Attack -->
+
+<!-- Check Expansion -->
 <script type="text/javascript">
 
 </script>
 
 <script type="text/javascript">
-	//Refresh Timer
+	//Auto Refresh Loads
 var auto_refresh = setInterval(
 function ()
 {
 $('#creds').load('/').fadeIn("slow");
-}, 3000);
+
+
+{% if client %}
+	 {% load modextras %}
+    {% for host in client %}
+		$(document).ready(function() {
+			if( $('#expand{{ forloop.counter }}').is(":visible") ) {
+					//Visible
+			  $.post("/netctrl/expand/", {
+						boxnum: "{{ forloop.counter }}",
+						address: "{{ host.address }}"
+						} );
+			}
+			else {
+					//Not Visible
+			  $.post("/netctrl/shrink/", {
+						boxnum: "{{ forloop.counter }}",
+						address: "{{ host.address }}"
+						} );
+			}
+		});
+    {% endfor %}
+{% endif %}
+
+$('#netviewmaincont').load('/netview/').fadeIn("slow");
+
+}, 10000);
 </script>
 
 <script type="text/javascript">
 $(document).ready(function() {
   $('#creds').load('/').fadeIn("slow");
+});
+</script>
+
+<script type="text/javascript">
+	//NetView Reload
+$(document).ready(function() {
+  $('#netviewmaincont').load('/netview/').fadeIn("slow");
 });
 </script>
 
@@ -51,32 +85,6 @@ $(document).ready(function() {
 	$(document).ready(function () {
 	  $(".window").hide();
 	});
-</script>
-
-
-<script type="text/javascript">
-{% if status == "on" %}
-	$(document).ready(function () {
-	  $("#startpwn").hide("slow")
-	});
-	$(document).ready(function () {
-	  $("#onbar").show("slow");
-	});
-	$(document).ready(function () {
-	  $("#stoppwn").show("slow");
-	});
-{% else %}
-	$(document).ready(function () {
-	  $("#startpwn").show("slow");
-	});
-	$(document).ready(function () {
-	  $("#onbar").hide("slow")
-	});
-	$(document).ready(function () {
-	  $("#stoppwn").hide("slow");
-	});
-
-{% endif %}
 </script>
 
 <script type="text/javascript">
@@ -270,10 +278,42 @@ $(document).ready(function() {
     
         $(".window").show("slow")
         $(".window").delay(3000).hide("slow");
-    });         
+    });
+	 
+	 
+	         //select all the a tags named reset
+    $('a[name=update]').click(function(e) {
+            //Cancel the link behavior
+        e.preventDefault();
+            //Get the A tag         
+        var id = $(this).attr('href');
+     
+            //Get the screen height and width
+        var maskHeight = $(document).height();
+        var maskWidth = $(window).width();
+     
+     
+            //Get the window height and width
+        var winH = $(window).height();
+        var winW = $(window).width();
+               
+            //Set the popup window to center
+        $(id).css('top',  winH/2-$(id).height()/2);
+        $(id).css('left', winW/2-$(id).width()/2);     
+        $(id).fadeIn(4000);
+            
+        $(".window").show("slow")
+        $(".window").delay(3000).hide("slow");
+		  
+		  alert('Updating Subterfuge...');
+		            //Start Pwning
+        $('#invis').delay(5000).load('/config/update/');
+    });
      
 });
  
 </script>
+
+
 
 </head>

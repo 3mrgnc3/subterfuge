@@ -133,7 +133,7 @@ try:
 				if (line.find(i) >= 0): #if it is in the string
 					#parse for host
 					hoststr = re.findall(r'\(.*?\):', line)
-					if not hoststr is None:
+					if (len(hoststr) > 0):
 						host = hoststr[0].partition('(')
 						hoststr = host[2]
 						host = hoststr.partition(')')
